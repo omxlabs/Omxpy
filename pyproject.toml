@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "omxpy"
+version = "0.0.3"
+description = ""
+authors = ["Omxadmin <omxlabs@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+cosmpy = "^0.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

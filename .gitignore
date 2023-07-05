@@ -1,0 +1,6 @@
+.vscode
+/artifacts
+/osmosis
+/mytestnet
+__pycache__
+/dist
