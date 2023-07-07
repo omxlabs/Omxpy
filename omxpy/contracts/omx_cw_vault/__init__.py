@@ -357,8 +357,11 @@ class SetTokenConfigMsg(TypedDict):
 	token_decimals: int
 	token_weight: "Uint128"
 
+SetUsdoAmountMsg__token = str
+
 class SetUsdoAmountMsg(TypedDict):
-	pass
+	amount: "Uint128"
+	token: str
 
 SwapMsg__recipient = Optional[str]
 
@@ -900,8 +903,8 @@ class OmxCwVault(BaseOmxClient):
 	def set_token_config(self, is_shortable: bool, is_stable: bool, max_usdo_amount: "Uint128", min_profit_bps: "Uint128", token: str, token_decimals: int, token_weight: "Uint128") -> SubmittedTx:
 		return self.execute({"set_token_config": {"is_shortable": is_shortable, "is_stable": is_stable, "max_usdo_amount": max_usdo_amount, "min_profit_bps": min_profit_bps, "token": token, "token_decimals": token_decimals, "token_weight": token_weight}})
 
-	def set_usdo_amount(self) -> SubmittedTx:
-		return self.execute({"set_usdo_amount": {}})
+	def set_usdo_amount(self, amount: "Uint128", token: str) -> SubmittedTx:
+		return self.execute({"set_usdo_amount": {"amount": amount, "token": token}})
 
 	def swap(self, recipient: str, token_in: str, token_out: str) -> SubmittedTx:
 		return self.execute({"swap": {"recipient": recipient, "token_in": token_in, "token_out": token_out}})

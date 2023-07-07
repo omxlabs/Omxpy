@@ -153,21 +153,16 @@ class CreateDecreaseOrderExec(TypedDict):
 	trigger_above_threshold: bool
 	trigger_price: "Uint128"
 
-CreateDecreaseOrderInternalExec__account = str
-
-CreateDecreaseOrderInternalExec__collateral_token = str
-
-CreateDecreaseOrderInternalExec__index_token = str
-
 CreateDecreaseOrderInternalExec__is_long = bool
 
 CreateDecreaseOrderInternalExec__trigger_above_threshold = bool
 
 class CreateDecreaseOrderInternalExec(TypedDict):
-	account: str
+	account: "Addr"
 	collateral_delta: "Uint128"
-	collateral_token: str
-	index_token: str
+	collateral_token: "Addr"
+	execution_fee: "Uint128"
+	index_token: "Addr"
 	is_long: bool
 	size_delta: "Uint128"
 	trigger_above_threshold: bool
@@ -286,6 +281,13 @@ class CreateSwapOrderInternalExec(TypedDict):
 	should_unwrap: bool
 	trigger_above_threshold: bool
 	trigger_ratio: "Uint128"
+
+class ExecuteDecreaseOrderCbExec(TypedDict):
+	balance_before: "Uint128"
+	current_price: "Uint128"
+	fee_receiver: "Addr"
+	order: "DecreaseOrder"
+	order_index: "Uint128"
 
 ExecuteDecreaseOrderExec__address = str
 
@@ -536,6 +538,9 @@ class ExecuteMsg__create_swap_order_internal(TypedDict):
 class ExecuteMsg__execute_decrease_order(TypedDict):
 	execute_decrease_order: "ExecuteDecreaseOrderExec"
 
+class ExecuteMsg__execute_decrease_order_cb(TypedDict):
+	execute_decrease_order_cb: "ExecuteDecreaseOrderCbExec"
+
 class ExecuteMsg__execute_increase_order(TypedDict):
 	execute_increase_order: "ExecuteIncreaseOrderExec"
 
@@ -578,7 +583,7 @@ class ExecuteMsg__create_increase_order_swap_cb(TypedDict):
 class ExecuteMsg__create_increase_order_cb(TypedDict):
 	create_increase_order_cb: "CreateIncreaseOrderCbExec"
 
-ExecuteMsg = Union["ExecuteMsg__set_admin", "ExecuteMsg__set_min_execution_fee", "ExecuteMsg__set_min_purchase_token_amount_usd", "ExecuteMsg__cancel_decrease_order", "ExecuteMsg__cancel_increase_order", "ExecuteMsg__cancel_swap_order", "ExecuteMsg__create_decrease_order_internal", "ExecuteMsg__create_decrease_order", "ExecuteMsg__create_increase_order_internal", "ExecuteMsg__create_increase_order", "ExecuteMsg__create_swap_order", "ExecuteMsg__create_swap_order_internal", "ExecuteMsg__execute_decrease_order", "ExecuteMsg__execute_increase_order", "ExecuteMsg__execute_increase_order_cb", "ExecuteMsg__execute_swap_order", "ExecuteMsg__execute_swap_order_cb", "ExecuteMsg__swap_internal", "ExecuteMsg__transfer_in_osmo_internal", "ExecuteMsg__transfer_out_osmo_internal", "ExecuteMsg__update_decrease_order", "ExecuteMsg__update_increase_order", "ExecuteMsg__update_swap_order", "ExecuteMsg__vault_swap_internal", "ExecuteMsg__swap_internal_cb", "ExecuteMsg__create_increase_order_swap_cb", "ExecuteMsg__create_increase_order_cb"]
+ExecuteMsg = Union["ExecuteMsg__set_admin", "ExecuteMsg__set_min_execution_fee", "ExecuteMsg__set_min_purchase_token_amount_usd", "ExecuteMsg__cancel_decrease_order", "ExecuteMsg__cancel_increase_order", "ExecuteMsg__cancel_swap_order", "ExecuteMsg__create_decrease_order_internal", "ExecuteMsg__create_decrease_order", "ExecuteMsg__create_increase_order_internal", "ExecuteMsg__create_increase_order", "ExecuteMsg__create_swap_order", "ExecuteMsg__create_swap_order_internal", "ExecuteMsg__execute_decrease_order", "ExecuteMsg__execute_decrease_order_cb", "ExecuteMsg__execute_increase_order", "ExecuteMsg__execute_increase_order_cb", "ExecuteMsg__execute_swap_order", "ExecuteMsg__execute_swap_order_cb", "ExecuteMsg__swap_internal", "ExecuteMsg__transfer_in_osmo_internal", "ExecuteMsg__transfer_out_osmo_internal", "ExecuteMsg__update_decrease_order", "ExecuteMsg__update_increase_order", "ExecuteMsg__update_swap_order", "ExecuteMsg__vault_swap_internal", "ExecuteMsg__swap_internal_cb", "ExecuteMsg__create_increase_order_swap_cb", "ExecuteMsg__create_increase_order_cb"]
 
 class QueryMsg__swap_order(TypedDict):
 	swap_order: "SwapOrderQuery"
@@ -648,8 +653,8 @@ class OmxCwOrderbook(BaseOmxClient):
 	def cancel_swap_order(self, order_index: "Uint128") -> SubmittedTx:
 		return self.execute({"cancel_swap_order": {"order_index": order_index}})
 
-	def create_decrease_order_internal(self, account: str, collateral_delta: "Uint128", collateral_token: str, index_token: str, is_long: bool, size_delta: "Uint128", trigger_above_threshold: bool, trigger_price: "Uint128") -> SubmittedTx:
-		return self.execute({"create_decrease_order_internal": {"account": account, "collateral_delta": collateral_delta, "collateral_token": collateral_token, "index_token": index_token, "is_long": is_long, "size_delta": size_delta, "trigger_above_threshold": trigger_above_threshold, "trigger_price": trigger_price}})
+	def create_decrease_order_internal(self, account: "Addr", collateral_delta: "Uint128", collateral_token: "Addr", execution_fee: "Uint128", index_token: "Addr", is_long: bool, size_delta: "Uint128", trigger_above_threshold: bool, trigger_price: "Uint128") -> SubmittedTx:
+		return self.execute({"create_decrease_order_internal": {"account": account, "collateral_delta": collateral_delta, "collateral_token": collateral_token, "execution_fee": execution_fee, "index_token": index_token, "is_long": is_long, "size_delta": size_delta, "trigger_above_threshold": trigger_above_threshold, "trigger_price": trigger_price}})
 
 	def create_decrease_order(self, collateral_delta: "Uint128", collateral_token: str, index_token: str, is_long: bool, size_delta: "Uint128", trigger_above_threshold: bool, trigger_price: "Uint128") -> SubmittedTx:
 		return self.execute({"create_decrease_order": {"collateral_delta": collateral_delta, "collateral_token": collateral_token, "index_token": index_token, "is_long": is_long, "size_delta": size_delta, "trigger_above_threshold": trigger_above_threshold, "trigger_price": trigger_price}})
@@ -668,6 +673,9 @@ class OmxCwOrderbook(BaseOmxClient):
 
 	def execute_decrease_order(self, address: str, fee_receiver: str, order_index: "Uint128") -> SubmittedTx:
 		return self.execute({"execute_decrease_order": {"address": address, "fee_receiver": fee_receiver, "order_index": order_index}})
+
+	def execute_decrease_order_cb(self, balance_before: "Uint128", current_price: "Uint128", fee_receiver: "Addr", order: "DecreaseOrder", order_index: "Uint128") -> SubmittedTx:
+		return self.execute({"execute_decrease_order_cb": {"balance_before": balance_before, "current_price": current_price, "fee_receiver": fee_receiver, "order": order, "order_index": order_index}})
 
 	def execute_increase_order(self, account: str, fee_recipient: str, order_index: "Uint128") -> SubmittedTx:
 		return self.execute({"execute_increase_order": {"account": account, "fee_recipient": fee_recipient, "order_index": order_index}})
