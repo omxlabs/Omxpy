@@ -6,28 +6,30 @@ from typing import TypedDict, Union
 
 QueryResponse_price = str
 
-Addr = str
+Identifier = str
+
+SetAdminExec__admin = str
 
 class SetAdminExec(TypedDict):
-	admin: "Addr"
+	admin: str
 
-SetPriceSampleSpaceExec__value = int
+SetMaxPriceAgeExec__value = int
 
-class SetPriceSampleSpaceExec(TypedDict):
+class SetMaxPriceAgeExec(TypedDict):
 	value: int
 
+SetPriceFeedExec__address = str
+
+class SetPriceFeedExec(TypedDict):
+	address: str
+
 SetTokenConfigExec__is_strict_stable = bool
-
-SetTokenConfigExec__price_decimals = int
-
-SetTokenConfigExec__price_feed = str
 
 SetTokenConfigExec__token = str
 
 class SetTokenConfigExec(TypedDict):
 	is_strict_stable: bool
-	price_decimals: int
-	price_feed: str
+	price_feed: "Identifier"
 	token: str
 
 PriceQuery__include_amm_price = bool
@@ -47,10 +49,13 @@ class ExecuteMsg__set_admin(TypedDict):
 class ExecuteMsg__set_token_config(TypedDict):
 	set_token_config: "SetTokenConfigExec"
 
-class ExecuteMsg__set_price_sample_space(TypedDict):
-	set_price_sample_space: "SetPriceSampleSpaceExec"
+class ExecuteMsg__set_price_feed(TypedDict):
+	set_price_feed: "SetPriceFeedExec"
 
-ExecuteMsg = Union["ExecuteMsg__set_admin", "ExecuteMsg__set_token_config", "ExecuteMsg__set_price_sample_space"]
+class ExecuteMsg__set_max_price_age(TypedDict):
+	set_max_price_age: "SetMaxPriceAgeExec"
+
+ExecuteMsg = Union["ExecuteMsg__set_admin", "ExecuteMsg__set_token_config", "ExecuteMsg__set_price_feed", "ExecuteMsg__set_max_price_age"]
 
 class QueryMsg__price(TypedDict):
 	price: "PriceQuery"
@@ -84,14 +89,17 @@ class OmxCwVaultPriceFeed(BaseOmxClient):
 		o.wallet = wallet
 		return o
 
-	def set_admin(self, admin: "Addr") -> SubmittedTx:
+	def set_admin(self, admin: str) -> SubmittedTx:
 		return self.execute({"set_admin": {"admin": admin}})
 
-	def set_token_config(self, is_strict_stable: bool, price_decimals: int, price_feed: str, token: str) -> SubmittedTx:
-		return self.execute({"set_token_config": {"is_strict_stable": is_strict_stable, "price_decimals": price_decimals, "price_feed": price_feed, "token": token}})
+	def set_token_config(self, is_strict_stable: bool, price_feed: "Identifier", token: str) -> SubmittedTx:
+		return self.execute({"set_token_config": {"is_strict_stable": is_strict_stable, "price_feed": price_feed, "token": token}})
 
-	def set_price_sample_space(self, value: int) -> SubmittedTx:
-		return self.execute({"set_price_sample_space": {"value": value}})
+	def set_price_feed(self, address: str) -> SubmittedTx:
+		return self.execute({"set_price_feed": {"address": address}})
+
+	def set_max_price_age(self, value: int) -> SubmittedTx:
+		return self.execute({"set_max_price_age": {"value": value}})
 
 	def price(self, include_amm_price: bool, maximize: bool, token: str) -> "QueryResponse_price":
 		return self.query({"price": {"include_amm_price": include_amm_price, "maximize": maximize, "token": token}})

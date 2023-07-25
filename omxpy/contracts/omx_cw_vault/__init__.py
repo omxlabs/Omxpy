@@ -71,6 +71,18 @@ QueryResponse_position_fee = str
 
 QueryResponse_position_leverage = str
 
+Addr = str
+
+PositionKey__is_long = bool
+
+class PositionKey(TypedDict):
+	account: "Addr"
+	collateral_token: "Addr"
+	index_token: "Addr"
+	is_long: bool
+
+QueryResponse_positions = List["PositionKey"]
+
 QueryResponse_redemption_amount = str
 
 QueryResponse_redemption_collateral = str
@@ -88,8 +100,6 @@ QueryResponse_usdo_amount = str
 QueryResponse_utilization = str
 
 QueryResponse_validate_liquidation = str
-
-Addr = str
 
 class QueryResponse_vault_config(TypedDict):
 	usdo: "Addr"
@@ -568,6 +578,23 @@ class PositionQuery(TypedDict):
 	index_token: str
 	is_long: bool
 
+PositionsQuery__account = Optional[str]
+
+PositionsQuery__collateral_token = Optional[str]
+
+PositionsQuery__index_token = Optional[str]
+
+PositionsQuery__is_long = Optional[bool]
+
+PositionsQuery__valid = Optional[bool]
+
+class PositionsQuery(TypedDict):
+	account: str
+	collateral_token: str
+	index_token: str
+	is_long: bool
+	valid: bool
+
 RedemptionAmountQuery__token = str
 
 class RedemptionAmountQuery(TypedDict):
@@ -817,6 +844,9 @@ class QueryMsg__pool_amount(TypedDict):
 class QueryMsg__whitelisted_token(TypedDict):
 	whitelisted_token: "WhitelistedTokenQuery"
 
+class QueryMsg__positions(TypedDict):
+	positions: "PositionsQuery"
+
 class QueryMsg__position(TypedDict):
 	position: "PositionQuery"
 
@@ -826,7 +856,7 @@ class QueryMsg__fee_reserves(TypedDict):
 class QueryMsg__validate_liquidation(TypedDict):
 	validate_liquidation: "ValidateLiquidationQuery"
 
-QueryMsg = Union["QueryMsg__vault_state", "QueryMsg__vault_config", "QueryMsg__utilization", "QueryMsg__cumulative_funding_rates", "QueryMsg__position_leverage", "QueryMsg__token_to_usd_min", "QueryMsg__global_short_average_prices", "QueryMsg__global_short_sizes", "QueryMsg__position_delta", "QueryMsg__reserved_amounts", "QueryMsg__guaranteed_usd", "QueryMsg__usdo_amount", "QueryMsg__entry_funding_rate", "QueryMsg__next_global_short_average_price", "QueryMsg__next_funding_rate", "QueryMsg__funding_fee", "QueryMsg__min_price", "QueryMsg__max_price", "QueryMsg__redemption_amount", "QueryMsg__target_usdo_amount", "QueryMsg__adjust_for_decimals", "QueryMsg__is_router_approved", "QueryMsg__get_delta", "QueryMsg__redemption_collateral", "QueryMsg__redemption_collateral_usd", "QueryMsg__position_fee", "QueryMsg__max_global_short_price", "QueryMsg__next_average_price", "QueryMsg__is_manager", "QueryMsg__pool_amount", "QueryMsg__whitelisted_token", "QueryMsg__position", "QueryMsg__fee_reserves", "QueryMsg__validate_liquidation"]
+QueryMsg = Union["QueryMsg__vault_state", "QueryMsg__vault_config", "QueryMsg__utilization", "QueryMsg__cumulative_funding_rates", "QueryMsg__position_leverage", "QueryMsg__token_to_usd_min", "QueryMsg__global_short_average_prices", "QueryMsg__global_short_sizes", "QueryMsg__position_delta", "QueryMsg__reserved_amounts", "QueryMsg__guaranteed_usd", "QueryMsg__usdo_amount", "QueryMsg__entry_funding_rate", "QueryMsg__next_global_short_average_price", "QueryMsg__next_funding_rate", "QueryMsg__funding_fee", "QueryMsg__min_price", "QueryMsg__max_price", "QueryMsg__redemption_amount", "QueryMsg__target_usdo_amount", "QueryMsg__adjust_for_decimals", "QueryMsg__is_router_approved", "QueryMsg__get_delta", "QueryMsg__redemption_collateral", "QueryMsg__redemption_collateral_usd", "QueryMsg__position_fee", "QueryMsg__max_global_short_price", "QueryMsg__next_average_price", "QueryMsg__is_manager", "QueryMsg__pool_amount", "QueryMsg__whitelisted_token", "QueryMsg__positions", "QueryMsg__position", "QueryMsg__fee_reserves", "QueryMsg__validate_liquidation"]
 
 
 
@@ -1031,6 +1061,9 @@ class OmxCwVault(BaseOmxClient):
 
 	def whitelisted_token(self, token: str) -> "QueryResponse_whitelisted_token":
 		return self.query({"whitelisted_token": {"token": token}})
+
+	def positions(self, account: str, collateral_token: str, index_token: str, is_long: bool, valid: bool) -> "QueryResponse_positions":
+		return self.query({"positions": {"account": account, "collateral_token": collateral_token, "index_token": index_token, "is_long": is_long, "valid": valid}})
 
 	def position(self, account: str, collateral_token: str, index_token: str, is_long: bool) -> "QueryResponse_position":
 		return self.query({"position": {"account": account, "collateral_token": collateral_token, "index_token": index_token, "is_long": is_long}})
