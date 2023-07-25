@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "omxpy"
-version = "0.0.5"
+version = "0.0.7"
 description = ""
 authors = ["Omx <omxlabs@gmail.com>"]
 readme = "README.md"
