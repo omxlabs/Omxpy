@@ -1,7 +1,7 @@
 from omxpy.base_client import BaseOmxClient
 from cosmpy.aerial.tx_helpers import SubmittedTx
 from cosmpy.aerial.wallet import Wallet
-from typing import TypedDict, Tuple, List, Optional, Union
+from typing import Tuple, TypedDict, List, Optional, Union
 
 
 QueryResponse_adjust_for_decimals = str
@@ -16,10 +16,12 @@ QueryResponse_funding_fee = str
 
 Uint128 = str
 
+QueryResponse_get_delta__delta = Tuple["Uint128"]
+
 QueryResponse_get_delta__has_profit = bool
 
 class QueryResponse_get_delta(TypedDict):
-	delta: "Uint128"
+	delta: "QueryResponse_get_delta__delta"
 	has_profit: bool
 
 QueryResponse_global_short_average_prices = str
@@ -61,10 +63,12 @@ class QueryResponse_position(TypedDict):
 	reserve_amount: "Uint128"
 	size: "Uint128"
 
+QueryResponse_position_delta__delta = Tuple["Uint128"]
+
 QueryResponse_position_delta__has_profit = bool
 
 class QueryResponse_position_delta(TypedDict):
-	delta: "Uint128"
+	delta: "QueryResponse_position_delta__delta"
 	has_profit: bool
 
 QueryResponse_position_fee = str
@@ -128,6 +132,10 @@ QueryResponse_vault_state__is_manager_mode = bool
 
 QueryResponse_vault_state__is_swap_enabled = bool
 
+QueryResponse_vault_state__price_impact_exp = int
+
+QueryResponse_vault_state__price_impact_factor = Tuple["Uint128"]
+
 QueryResponse_vault_state__router = Optional["Addr"]
 
 QueryResponse_vault_state__use_swap_pricing = bool
@@ -151,6 +159,8 @@ class QueryResponse_vault_state(TypedDict):
 	min_profit_time: "Duration"
 	mint_burn_fee_basis_points: "Uint128"
 	price_feed: "Addr"
+	price_impact_exp: int
+	price_impact_factor: "QueryResponse_vault_state__price_impact_factor"
 	router: "QueryResponse_vault_state__router"
 	stable_funding_rate_factor: "Uint128"
 	stable_swap_fee_basis_points: "Uint128"
@@ -258,14 +268,6 @@ class LiquidatePositionMsg(TypedDict):
 	index_token: str
 	is_long: bool
 
-SellUsdoAmountMsg__amount = Tuple["Uint128"]
-
-SellUsdoAmountMsg__token = str
-
-class SellUsdoAmountMsg(TypedDict):
-	amount: "SellUsdoAmountMsg__amount"
-	token: str
-
 class SellUsdoCbMsg(TypedDict):
 	recipient: "Addr"
 	redemption_amount: "Uint128"
@@ -367,10 +369,12 @@ class SetTokenConfigMsg(TypedDict):
 	token_decimals: int
 	token_weight: "Uint128"
 
+SetUsdoAmountMsg__amount = Tuple["Uint128"]
+
 SetUsdoAmountMsg__token = str
 
 class SetUsdoAmountMsg(TypedDict):
-	amount: "Uint128"
+	amount: "SetUsdoAmountMsg__amount"
 	token: str
 
 SwapMsg__recipient = Optional[str]
@@ -695,9 +699,6 @@ class ExecuteMsg__sell_usdo(TypedDict):
 class ExecuteMsg__sell_usdo_cb(TypedDict):
 	sell_usdo_cb: "SellUsdoCbMsg"
 
-class ExecuteMsg__sell_usdo_amount(TypedDict):
-	sell_usdo_amount: "SellUsdoAmountMsg"
-
 class ExecuteMsg__set_fees(TypedDict):
 	set_fees: "SetFeesMsg"
 
@@ -743,7 +744,7 @@ class ExecuteMsg__set_manager(TypedDict):
 class ExecuteMsg__set_admin(TypedDict):
 	set_admin: "SetAdminMsg"
 
-ExecuteMsg = Union["ExecuteMsg__buy_usdo", "ExecuteMsg__set_is_liquidator", "ExecuteMsg__add_router", "ExecuteMsg__buy_usdo_cb", "ExecuteMsg__clear_token_config", "ExecuteMsg__decrease_position", "ExecuteMsg__direct_pool_deposit", "ExecuteMsg__increase_position", "ExecuteMsg__liquidate_position", "ExecuteMsg__set_router", "ExecuteMsg__sell_usdo", "ExecuteMsg__sell_usdo_cb", "ExecuteMsg__sell_usdo_amount", "ExecuteMsg__set_fees", "ExecuteMsg__set_funding_rate", "ExecuteMsg__set_token_config", "ExecuteMsg__set_usdo_amount", "ExecuteMsg__swap", "ExecuteMsg__update_cumulative_funding_rate", "ExecuteMsg__withdraw_fees", "ExecuteMsg__set_in_manager_mode", "ExecuteMsg__set_in_private_liquidation_mode", "ExecuteMsg__set_is_swap_enabled", "ExecuteMsg__set_is_leverage_enabled", "ExecuteMsg__set_max_gas_price", "ExecuteMsg__set_max_global_short_price", "ExecuteMsg__set_manager", "ExecuteMsg__set_admin"]
+ExecuteMsg = Union["ExecuteMsg__buy_usdo", "ExecuteMsg__set_is_liquidator", "ExecuteMsg__add_router", "ExecuteMsg__buy_usdo_cb", "ExecuteMsg__clear_token_config", "ExecuteMsg__decrease_position", "ExecuteMsg__direct_pool_deposit", "ExecuteMsg__increase_position", "ExecuteMsg__liquidate_position", "ExecuteMsg__set_router", "ExecuteMsg__sell_usdo", "ExecuteMsg__sell_usdo_cb", "ExecuteMsg__set_fees", "ExecuteMsg__set_funding_rate", "ExecuteMsg__set_token_config", "ExecuteMsg__set_usdo_amount", "ExecuteMsg__swap", "ExecuteMsg__update_cumulative_funding_rate", "ExecuteMsg__withdraw_fees", "ExecuteMsg__set_in_manager_mode", "ExecuteMsg__set_in_private_liquidation_mode", "ExecuteMsg__set_is_swap_enabled", "ExecuteMsg__set_is_leverage_enabled", "ExecuteMsg__set_max_gas_price", "ExecuteMsg__set_max_global_short_price", "ExecuteMsg__set_manager", "ExecuteMsg__set_admin"]
 
 class QueryMsg__vault_state__vault_state(TypedDict):
 	pass
@@ -921,9 +922,6 @@ class OmxCwVault(BaseOmxClient):
 	def sell_usdo_cb(self, recipient: "Addr", redemption_amount: "Uint128", token: "Addr", usdo_amount: "Uint128") -> SubmittedTx:
 		return self.execute({"sell_usdo_cb": {"recipient": recipient, "redemption_amount": redemption_amount, "token": token, "usdo_amount": usdo_amount}})
 
-	def sell_usdo_amount(self, amount: "SellUsdoAmountMsg__amount", token: str) -> SubmittedTx:
-		return self.execute({"sell_usdo_amount": {"amount": amount, "token": token}})
-
 	def set_fees(self, has_dynamic_fees: bool, liquidation_fee_usd: "Uint128", margin_fee_basis_points: "Uint128", min_profit_time: "Duration", mint_burn_fee_basis_points: "Uint128", stable_swap_fee_basis_points: "Uint128", stable_tax_basis_points: "Uint128", swap_fee_basis_points: "Uint128", tax_basis_points: "Uint128") -> SubmittedTx:
 		return self.execute({"set_fees": {"has_dynamic_fees": has_dynamic_fees, "liquidation_fee_usd": liquidation_fee_usd, "margin_fee_basis_points": margin_fee_basis_points, "min_profit_time": min_profit_time, "mint_burn_fee_basis_points": mint_burn_fee_basis_points, "stable_swap_fee_basis_points": stable_swap_fee_basis_points, "stable_tax_basis_points": stable_tax_basis_points, "swap_fee_basis_points": swap_fee_basis_points, "tax_basis_points": tax_basis_points}})
 
@@ -933,7 +931,7 @@ class OmxCwVault(BaseOmxClient):
 	def set_token_config(self, is_shortable: bool, is_stable: bool, max_usdo_amount: "Uint128", min_profit_bps: "Uint128", token: str, token_decimals: int, token_weight: "Uint128") -> SubmittedTx:
 		return self.execute({"set_token_config": {"is_shortable": is_shortable, "is_stable": is_stable, "max_usdo_amount": max_usdo_amount, "min_profit_bps": min_profit_bps, "token": token, "token_decimals": token_decimals, "token_weight": token_weight}})
 
-	def set_usdo_amount(self, amount: "Uint128", token: str) -> SubmittedTx:
+	def set_usdo_amount(self, amount: "SetUsdoAmountMsg__amount", token: str) -> SubmittedTx:
 		return self.execute({"set_usdo_amount": {"amount": amount, "token": token}})
 
 	def swap(self, recipient: str, token_in: str, token_out: str) -> SubmittedTx:
