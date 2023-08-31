@@ -72,8 +72,6 @@ class QueryResponse_download_logo(TypedDict):
 	data: "Binary"
 	mime_type: str
 
-QueryResponse_id = str
-
 Addr = str
 
 LogoInfo__url__url = str
@@ -107,9 +105,6 @@ class QueryResponse_minter(TypedDict):
 	cap: "QueryResponse_minter__cap"
 	minter: str
 
-class QueryResponse_staked_balance(TypedDict):
-	balance: "Uint128"
-
 QueryResponse_token_info__decimals = int
 
 QueryResponse_token_info__name = str
@@ -121,8 +116,6 @@ class QueryResponse_token_info(TypedDict):
 	name: str
 	symbol: str
 	total_supply: "Uint128"
-
-QueryResponse_total_staked = str
 
 class EmbeddedLogo__svg(TypedDict):
 	svg: "Binary"
@@ -150,6 +143,12 @@ class ExecuteMsg__transfer__transfer(TypedDict):
 
 class ExecuteMsg__transfer(TypedDict):
 	transfer: "ExecuteMsg__transfer__transfer"
+
+class ExecuteMsg__burn__burn(TypedDict):
+	amount: "Uint128"
+
+class ExecuteMsg__burn(TypedDict):
+	burn: "ExecuteMsg__burn__burn"
 
 ExecuteMsg__send__send__contract = str
 
@@ -253,42 +252,7 @@ class ExecuteMsg__update_marketing(TypedDict):
 class ExecuteMsg__upload_logo(TypedDict):
 	upload_logo: "Logo"
 
-ExecuteMsg__add_admin__add_admin__account = str
-
-class ExecuteMsg__add_admin__add_admin(TypedDict):
-	account: str
-
-class ExecuteMsg__add_admin(TypedDict):
-	add_admin: "ExecuteMsg__add_admin__add_admin"
-
-ExecuteMsg__remove_admin__remove_admin__account = str
-
-class ExecuteMsg__remove_admin__remove_admin(TypedDict):
-	account: str
-
-class ExecuteMsg__remove_admin(TypedDict):
-	remove_admin: "ExecuteMsg__remove_admin__remove_admin"
-
-ExecuteMsg__set_in_private_transfer_mode__set_in_private_transfer_mode__value = bool
-
-class ExecuteMsg__set_in_private_transfer_mode__set_in_private_transfer_mode(TypedDict):
-	value: bool
-
-class ExecuteMsg__set_in_private_transfer_mode(TypedDict):
-	set_in_private_transfer_mode: "ExecuteMsg__set_in_private_transfer_mode__set_in_private_transfer_mode"
-
-ExecuteMsg__set_handler__set_handler__account = str
-
-ExecuteMsg__set_handler__set_handler__is_handler = bool
-
-class ExecuteMsg__set_handler__set_handler(TypedDict):
-	account: str
-	is_handler: bool
-
-class ExecuteMsg__set_handler(TypedDict):
-	set_handler: "ExecuteMsg__set_handler__set_handler"
-
-ExecuteMsg = Union["ExecuteMsg__transfer", "ExecuteMsg__send", "ExecuteMsg__increase_allowance", "ExecuteMsg__decrease_allowance", "ExecuteMsg__transfer_from", "ExecuteMsg__send_from", "ExecuteMsg__burn_from", "ExecuteMsg__mint", "ExecuteMsg__update_minter", "ExecuteMsg__update_marketing", "ExecuteMsg__upload_logo", "ExecuteMsg__add_admin", "ExecuteMsg__remove_admin", "ExecuteMsg__set_in_private_transfer_mode", "ExecuteMsg__set_handler"]
+ExecuteMsg = Union["ExecuteMsg__transfer", "ExecuteMsg__burn", "ExecuteMsg__send", "ExecuteMsg__increase_allowance", "ExecuteMsg__decrease_allowance", "ExecuteMsg__transfer_from", "ExecuteMsg__send_from", "ExecuteMsg__burn_from", "ExecuteMsg__mint", "ExecuteMsg__update_minter", "ExecuteMsg__update_marketing", "ExecuteMsg__upload_logo"]
 
 QueryMsg__balance__balance__address = str
 
@@ -372,32 +336,12 @@ class QueryMsg__download_logo__download_logo(TypedDict):
 class QueryMsg__download_logo(TypedDict):
 	download_logo: "QueryMsg__download_logo__download_logo"
 
-class QueryMsg__total_staked__total_staked(TypedDict):
-	pass
-
-class QueryMsg__total_staked(TypedDict):
-	total_staked: "QueryMsg__total_staked__total_staked"
-
-QueryMsg__staked_balance__staked_balance__account = str
-
-class QueryMsg__staked_balance__staked_balance(TypedDict):
-	account: str
-
-class QueryMsg__staked_balance(TypedDict):
-	staked_balance: "QueryMsg__staked_balance__staked_balance"
-
-class QueryMsg__id__id(TypedDict):
-	pass
-
-class QueryMsg__id(TypedDict):
-	id: "QueryMsg__id__id"
-
-QueryMsg = Union["QueryMsg__balance", "QueryMsg__token_info", "QueryMsg__minter", "QueryMsg__allowance", "QueryMsg__all_allowances", "QueryMsg__all_spender_allowances", "QueryMsg__all_accounts", "QueryMsg__marketing_info", "QueryMsg__download_logo", "QueryMsg__total_staked", "QueryMsg__staked_balance", "QueryMsg__id"]
+QueryMsg = Union["QueryMsg__balance", "QueryMsg__token_info", "QueryMsg__minter", "QueryMsg__allowance", "QueryMsg__all_allowances", "QueryMsg__all_spender_allowances", "QueryMsg__all_accounts", "QueryMsg__marketing_info", "QueryMsg__download_logo"]
 
 
 
-class OmxCwBaseToken(BaseOmxClient):
-	def clone(self) -> "OmxCwBaseToken":
+class OmxCwStakedOlp(BaseOmxClient):
+	def clone(self) -> "OmxCwStakedOlp":
 		instance = self.__class__.__new__(self.__class__)
 		instance.tx = self.tx
 		instance.gas = self.gas
@@ -406,23 +350,26 @@ class OmxCwBaseToken(BaseOmxClient):
 		instance.funds = self.funds
 		return instance
 
-	def with_funds(self, funds: str) -> "OmxCwBaseToken":
+	def with_funds(self, funds: str) -> "OmxCwStakedOlp":
 		o = self.clone()
 		o.funds = funds
 		return o
 
-	def without_funds(self) -> "OmxCwBaseToken":
+	def without_funds(self) -> "OmxCwStakedOlp":
 		o = self.clone()
 		o.funds = None
 		return o
 
-	def with_wallet(self, wallet: Wallet) -> "OmxCwBaseToken":
+	def with_wallet(self, wallet: Wallet) -> "OmxCwStakedOlp":
 		o = self.clone()
 		o.wallet = wallet
 		return o
 
 	def transfer(self, amount: "Uint128", recipient: str) -> SubmittedTx:
 		return self.execute({"transfer": {"amount": amount, "recipient": recipient}})
+
+	def burn(self, amount: "Uint128") -> SubmittedTx:
+		return self.execute({"burn": {"amount": amount}})
 
 	def send(self, amount: "Uint128", contract: str, msg: "Binary") -> SubmittedTx:
 		return self.execute({"send": {"amount": amount, "contract": contract, "msg": msg}})
@@ -454,18 +401,6 @@ class OmxCwBaseToken(BaseOmxClient):
 	def upload_logo(self, value: Union["Logo__url", "Logo__embedded"]) -> SubmittedTx:
 		return self.execute({"upload_logo": value})
 
-	def add_admin(self, account: str) -> SubmittedTx:
-		return self.execute({"add_admin": {"account": account}})
-
-	def remove_admin(self, account: str) -> SubmittedTx:
-		return self.execute({"remove_admin": {"account": account}})
-
-	def set_in_private_transfer_mode(self, value: bool) -> SubmittedTx:
-		return self.execute({"set_in_private_transfer_mode": {"value": value}})
-
-	def set_handler(self, account: str, is_handler: bool) -> SubmittedTx:
-		return self.execute({"set_handler": {"account": account, "is_handler": is_handler}})
-
 	def balance(self, address: str) -> "QueryResponse_balance":
 		return self.query({"balance": {"address": address}})
 
@@ -492,12 +427,3 @@ class OmxCwBaseToken(BaseOmxClient):
 
 	def download_logo(self) -> "QueryResponse_download_logo":
 		return self.query({"download_logo": {}})
-
-	def total_staked(self) -> "QueryResponse_total_staked":
-		return self.query({"total_staked": {}})
-
-	def staked_balance(self, account: str) -> "QueryResponse_staked_balance":
-		return self.query({"staked_balance": {"account": account}})
-
-	def id(self) -> "QueryResponse_id":
-		return self.query({"id": {}})

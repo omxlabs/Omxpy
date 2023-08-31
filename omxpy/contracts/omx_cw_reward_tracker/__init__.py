@@ -61,8 +61,16 @@ class QueryResponse_allowance(TypedDict):
 	allowance: "Uint128"
 	expires: "Expiration"
 
+QueryResponse_average_staked_amount = str
+
 class QueryResponse_balance(TypedDict):
 	balance: "Uint128"
+
+QueryResponse_claimable = str
+
+QueryResponse_cumulative_rewards = str
+
+QueryResponse_deposit_balance = str
 
 Binary = str
 
@@ -72,7 +80,11 @@ class QueryResponse_download_logo(TypedDict):
 	data: "Binary"
 	mime_type: str
 
-QueryResponse_id = str
+QueryResponse_initialized = bool
+
+QueryResponse_is_deposit_token = bool
+
+QueryResponse_is_handler = bool
 
 Addr = str
 
@@ -107,8 +119,24 @@ class QueryResponse_minter(TypedDict):
 	cap: "QueryResponse_minter__cap"
 	minter: str
 
-class QueryResponse_staked_balance(TypedDict):
-	balance: "Uint128"
+QueryResponse_reward_token = str
+
+QueryResponse_reward_tracker_state__in_private_claiming_mode = bool
+
+QueryResponse_reward_tracker_state__in_private_staking_mode = bool
+
+QueryResponse_reward_tracker_state__in_private_transfer_mode = bool
+
+class QueryResponse_reward_tracker_state(TypedDict):
+	admin: "Addr"
+	cumulative_reward_per_token: "Uint128"
+	distributor: "Addr"
+	in_private_claiming_mode: bool
+	in_private_staking_mode: bool
+	in_private_transfer_mode: bool
+	vault: "Addr"
+
+QueryResponse_staked_amount = str
 
 QueryResponse_token_info__decimals = int
 
@@ -122,7 +150,7 @@ class QueryResponse_token_info(TypedDict):
 	symbol: str
 	total_supply: "Uint128"
 
-QueryResponse_total_staked = str
+QueryResponse_total_deposit_supply = str
 
 class EmbeddedLogo__svg(TypedDict):
 	svg: "Binary"
@@ -142,6 +170,14 @@ class Logo__embedded(TypedDict):
 
 Logo = Union["Logo__url", "Logo__embedded"]
 
+ExecuteMsg__initialize__initialize__distributor = str
+
+class ExecuteMsg__initialize__initialize(TypedDict):
+	distributor: str
+
+class ExecuteMsg__initialize(TypedDict):
+	initialize: "ExecuteMsg__initialize__initialize"
+
 ExecuteMsg__transfer__transfer__recipient = str
 
 class ExecuteMsg__transfer__transfer(TypedDict):
@@ -150,6 +186,12 @@ class ExecuteMsg__transfer__transfer(TypedDict):
 
 class ExecuteMsg__transfer(TypedDict):
 	transfer: "ExecuteMsg__transfer__transfer"
+
+class ExecuteMsg__burn__burn(TypedDict):
+	amount: "Uint128"
+
+class ExecuteMsg__burn(TypedDict):
+	burn: "ExecuteMsg__burn__burn"
 
 ExecuteMsg__send__send__contract = str
 
@@ -253,21 +295,13 @@ class ExecuteMsg__update_marketing(TypedDict):
 class ExecuteMsg__upload_logo(TypedDict):
 	upload_logo: "Logo"
 
-ExecuteMsg__add_admin__add_admin__account = str
+ExecuteMsg__set_admin__set_admin__account = str
 
-class ExecuteMsg__add_admin__add_admin(TypedDict):
+class ExecuteMsg__set_admin__set_admin(TypedDict):
 	account: str
 
-class ExecuteMsg__add_admin(TypedDict):
-	add_admin: "ExecuteMsg__add_admin__add_admin"
-
-ExecuteMsg__remove_admin__remove_admin__account = str
-
-class ExecuteMsg__remove_admin__remove_admin(TypedDict):
-	account: str
-
-class ExecuteMsg__remove_admin(TypedDict):
-	remove_admin: "ExecuteMsg__remove_admin__remove_admin"
+class ExecuteMsg__set_admin(TypedDict):
+	set_admin: "ExecuteMsg__set_admin__set_admin"
 
 ExecuteMsg__set_in_private_transfer_mode__set_in_private_transfer_mode__value = bool
 
@@ -276,6 +310,22 @@ class ExecuteMsg__set_in_private_transfer_mode__set_in_private_transfer_mode(Typ
 
 class ExecuteMsg__set_in_private_transfer_mode(TypedDict):
 	set_in_private_transfer_mode: "ExecuteMsg__set_in_private_transfer_mode__set_in_private_transfer_mode"
+
+ExecuteMsg__set_in_private_claiming_mode__set_in_private_claiming_mode__value = bool
+
+class ExecuteMsg__set_in_private_claiming_mode__set_in_private_claiming_mode(TypedDict):
+	value: bool
+
+class ExecuteMsg__set_in_private_claiming_mode(TypedDict):
+	set_in_private_claiming_mode: "ExecuteMsg__set_in_private_claiming_mode__set_in_private_claiming_mode"
+
+ExecuteMsg__set_in_private_staking_mode__set_in_private_staking_mode__value = bool
+
+class ExecuteMsg__set_in_private_staking_mode__set_in_private_staking_mode(TypedDict):
+	value: bool
+
+class ExecuteMsg__set_in_private_staking_mode(TypedDict):
+	set_in_private_staking_mode: "ExecuteMsg__set_in_private_staking_mode__set_in_private_staking_mode"
 
 ExecuteMsg__set_handler__set_handler__account = str
 
@@ -288,7 +338,91 @@ class ExecuteMsg__set_handler__set_handler(TypedDict):
 class ExecuteMsg__set_handler(TypedDict):
 	set_handler: "ExecuteMsg__set_handler__set_handler"
 
-ExecuteMsg = Union["ExecuteMsg__transfer", "ExecuteMsg__send", "ExecuteMsg__increase_allowance", "ExecuteMsg__decrease_allowance", "ExecuteMsg__transfer_from", "ExecuteMsg__send_from", "ExecuteMsg__burn_from", "ExecuteMsg__mint", "ExecuteMsg__update_minter", "ExecuteMsg__update_marketing", "ExecuteMsg__upload_logo", "ExecuteMsg__add_admin", "ExecuteMsg__remove_admin", "ExecuteMsg__set_in_private_transfer_mode", "ExecuteMsg__set_handler"]
+ExecuteMsg__set_deposit_token__set_deposit_token__is_deposit_token = bool
+
+ExecuteMsg__set_deposit_token__set_deposit_token__token = str
+
+class ExecuteMsg__set_deposit_token__set_deposit_token(TypedDict):
+	is_deposit_token: bool
+	token: str
+
+class ExecuteMsg__set_deposit_token(TypedDict):
+	set_deposit_token: "ExecuteMsg__set_deposit_token__set_deposit_token"
+
+ExecuteMsg__stake__stake__deposit_token = str
+
+class ExecuteMsg__stake__stake(TypedDict):
+	amount: "Uint128"
+	deposit_token: str
+
+class ExecuteMsg__stake(TypedDict):
+	stake: "ExecuteMsg__stake__stake"
+
+ExecuteMsg__stake_for_account__stake_for_account__account = str
+
+ExecuteMsg__stake_for_account__stake_for_account__deposit_token = str
+
+ExecuteMsg__stake_for_account__stake_for_account__funding_account = str
+
+class ExecuteMsg__stake_for_account__stake_for_account(TypedDict):
+	account: str
+	amount: "Uint128"
+	deposit_token: str
+	funding_account: str
+
+class ExecuteMsg__stake_for_account(TypedDict):
+	stake_for_account: "ExecuteMsg__stake_for_account__stake_for_account"
+
+ExecuteMsg__unstake__unstake__deposit_token = str
+
+class ExecuteMsg__unstake__unstake(TypedDict):
+	amount: "Uint128"
+	deposit_token: str
+
+class ExecuteMsg__unstake(TypedDict):
+	unstake: "ExecuteMsg__unstake__unstake"
+
+ExecuteMsg__unstake_for_account__unstake_for_account__account = str
+
+ExecuteMsg__unstake_for_account__unstake_for_account__deposit_token = str
+
+ExecuteMsg__unstake_for_account__unstake_for_account__recipient = str
+
+class ExecuteMsg__unstake_for_account__unstake_for_account(TypedDict):
+	account: str
+	amount: "Uint128"
+	deposit_token: str
+	recipient: str
+
+class ExecuteMsg__unstake_for_account(TypedDict):
+	unstake_for_account: "ExecuteMsg__unstake_for_account__unstake_for_account"
+
+class ExecuteMsg__update_rewards__update_rewards(TypedDict):
+	pass
+
+class ExecuteMsg__update_rewards(TypedDict):
+	update_rewards: "ExecuteMsg__update_rewards__update_rewards"
+
+ExecuteMsg__claim__claim__recipient = str
+
+class ExecuteMsg__claim__claim(TypedDict):
+	recipient: str
+
+class ExecuteMsg__claim(TypedDict):
+	claim: "ExecuteMsg__claim__claim"
+
+ExecuteMsg__claim_for_account__claim_for_account__account = str
+
+ExecuteMsg__claim_for_account__claim_for_account__recipient = str
+
+class ExecuteMsg__claim_for_account__claim_for_account(TypedDict):
+	account: str
+	recipient: str
+
+class ExecuteMsg__claim_for_account(TypedDict):
+	claim_for_account: "ExecuteMsg__claim_for_account__claim_for_account"
+
+ExecuteMsg = Union["ExecuteMsg__initialize", "ExecuteMsg__transfer", "ExecuteMsg__burn", "ExecuteMsg__send", "ExecuteMsg__increase_allowance", "ExecuteMsg__decrease_allowance", "ExecuteMsg__transfer_from", "ExecuteMsg__send_from", "ExecuteMsg__burn_from", "ExecuteMsg__mint", "ExecuteMsg__update_minter", "ExecuteMsg__update_marketing", "ExecuteMsg__upload_logo", "ExecuteMsg__set_admin", "ExecuteMsg__set_in_private_transfer_mode", "ExecuteMsg__set_in_private_claiming_mode", "ExecuteMsg__set_in_private_staking_mode", "ExecuteMsg__set_handler", "ExecuteMsg__set_deposit_token", "ExecuteMsg__stake", "ExecuteMsg__stake_for_account", "ExecuteMsg__unstake", "ExecuteMsg__unstake_for_account", "ExecuteMsg__update_rewards", "ExecuteMsg__claim", "ExecuteMsg__claim_for_account"]
 
 QueryMsg__balance__balance__address = str
 
@@ -372,32 +506,97 @@ class QueryMsg__download_logo__download_logo(TypedDict):
 class QueryMsg__download_logo(TypedDict):
 	download_logo: "QueryMsg__download_logo__download_logo"
 
-class QueryMsg__total_staked__total_staked(TypedDict):
-	pass
+QueryMsg__claimable__claimable__account = str
 
-class QueryMsg__total_staked(TypedDict):
-	total_staked: "QueryMsg__total_staked__total_staked"
-
-QueryMsg__staked_balance__staked_balance__account = str
-
-class QueryMsg__staked_balance__staked_balance(TypedDict):
+class QueryMsg__claimable__claimable(TypedDict):
 	account: str
 
-class QueryMsg__staked_balance(TypedDict):
-	staked_balance: "QueryMsg__staked_balance__staked_balance"
+class QueryMsg__claimable(TypedDict):
+	claimable: "QueryMsg__claimable__claimable"
 
-class QueryMsg__id__id(TypedDict):
+QueryMsg__deposit_balance__deposit_balance__account = str
+
+QueryMsg__deposit_balance__deposit_balance__token = str
+
+class QueryMsg__deposit_balance__deposit_balance(TypedDict):
+	account: str
+	token: str
+
+class QueryMsg__deposit_balance(TypedDict):
+	deposit_balance: "QueryMsg__deposit_balance__deposit_balance"
+
+QueryMsg__cumulative_rewards__cumulative_rewards__account = str
+
+class QueryMsg__cumulative_rewards__cumulative_rewards(TypedDict):
+	account: str
+
+class QueryMsg__cumulative_rewards(TypedDict):
+	cumulative_rewards: "QueryMsg__cumulative_rewards__cumulative_rewards"
+
+QueryMsg__average_staked_amount__average_staked_amount__account = str
+
+class QueryMsg__average_staked_amount__average_staked_amount(TypedDict):
+	account: str
+
+class QueryMsg__average_staked_amount(TypedDict):
+	average_staked_amount: "QueryMsg__average_staked_amount__average_staked_amount"
+
+QueryMsg__total_deposit_supply__total_deposit_supply__token = str
+
+class QueryMsg__total_deposit_supply__total_deposit_supply(TypedDict):
+	token: str
+
+class QueryMsg__total_deposit_supply(TypedDict):
+	total_deposit_supply: "QueryMsg__total_deposit_supply__total_deposit_supply"
+
+QueryMsg__staked_amount__staked_amount__account = str
+
+class QueryMsg__staked_amount__staked_amount(TypedDict):
+	account: str
+
+class QueryMsg__staked_amount(TypedDict):
+	staked_amount: "QueryMsg__staked_amount__staked_amount"
+
+class QueryMsg__reward_token__reward_token(TypedDict):
 	pass
 
-class QueryMsg__id(TypedDict):
-	id: "QueryMsg__id__id"
+class QueryMsg__reward_token(TypedDict):
+	reward_token: "QueryMsg__reward_token__reward_token"
 
-QueryMsg = Union["QueryMsg__balance", "QueryMsg__token_info", "QueryMsg__minter", "QueryMsg__allowance", "QueryMsg__all_allowances", "QueryMsg__all_spender_allowances", "QueryMsg__all_accounts", "QueryMsg__marketing_info", "QueryMsg__download_logo", "QueryMsg__total_staked", "QueryMsg__staked_balance", "QueryMsg__id"]
+class QueryMsg__initialized__initialized(TypedDict):
+	pass
+
+class QueryMsg__initialized(TypedDict):
+	initialized: "QueryMsg__initialized__initialized"
+
+QueryMsg__is_handler__is_handler__account = str
+
+class QueryMsg__is_handler__is_handler(TypedDict):
+	account: str
+
+class QueryMsg__is_handler(TypedDict):
+	is_handler: "QueryMsg__is_handler__is_handler"
+
+QueryMsg__is_deposit_token__is_deposit_token__token = str
+
+class QueryMsg__is_deposit_token__is_deposit_token(TypedDict):
+	token: str
+
+class QueryMsg__is_deposit_token(TypedDict):
+	is_deposit_token: "QueryMsg__is_deposit_token__is_deposit_token"
+
+class QueryMsg__reward_tracker_state__reward_tracker_state(TypedDict):
+	pass
+
+class QueryMsg__reward_tracker_state(TypedDict):
+	reward_tracker_state: "QueryMsg__reward_tracker_state__reward_tracker_state"
+
+QueryMsg = Union["QueryMsg__balance", "QueryMsg__token_info", "QueryMsg__minter", "QueryMsg__allowance", "QueryMsg__all_allowances", "QueryMsg__all_spender_allowances", "QueryMsg__all_accounts", "QueryMsg__marketing_info", "QueryMsg__download_logo", "QueryMsg__claimable", "QueryMsg__deposit_balance", "QueryMsg__cumulative_rewards", "QueryMsg__average_staked_amount", "QueryMsg__total_deposit_supply", "QueryMsg__staked_amount", "QueryMsg__reward_token", "QueryMsg__initialized", "QueryMsg__is_handler", "QueryMsg__is_deposit_token", "QueryMsg__reward_tracker_state"]
 
 
 
-class OmxCwBaseToken(BaseOmxClient):
-	def clone(self) -> "OmxCwBaseToken":
+class OmxCwRewardTracker(BaseOmxClient):
+	def clone(self) -> "OmxCwRewardTracker":
 		instance = self.__class__.__new__(self.__class__)
 		instance.tx = self.tx
 		instance.gas = self.gas
@@ -406,23 +605,29 @@ class OmxCwBaseToken(BaseOmxClient):
 		instance.funds = self.funds
 		return instance
 
-	def with_funds(self, funds: str) -> "OmxCwBaseToken":
+	def with_funds(self, funds: str) -> "OmxCwRewardTracker":
 		o = self.clone()
 		o.funds = funds
 		return o
 
-	def without_funds(self) -> "OmxCwBaseToken":
+	def without_funds(self) -> "OmxCwRewardTracker":
 		o = self.clone()
 		o.funds = None
 		return o
 
-	def with_wallet(self, wallet: Wallet) -> "OmxCwBaseToken":
+	def with_wallet(self, wallet: Wallet) -> "OmxCwRewardTracker":
 		o = self.clone()
 		o.wallet = wallet
 		return o
 
+	def initialize(self, distributor: str) -> SubmittedTx:
+		return self.execute({"initialize": {"distributor": distributor}})
+
 	def transfer(self, amount: "Uint128", recipient: str) -> SubmittedTx:
 		return self.execute({"transfer": {"amount": amount, "recipient": recipient}})
+
+	def burn(self, amount: "Uint128") -> SubmittedTx:
+		return self.execute({"burn": {"amount": amount}})
 
 	def send(self, amount: "Uint128", contract: str, msg: "Binary") -> SubmittedTx:
 		return self.execute({"send": {"amount": amount, "contract": contract, "msg": msg}})
@@ -454,17 +659,44 @@ class OmxCwBaseToken(BaseOmxClient):
 	def upload_logo(self, value: Union["Logo__url", "Logo__embedded"]) -> SubmittedTx:
 		return self.execute({"upload_logo": value})
 
-	def add_admin(self, account: str) -> SubmittedTx:
-		return self.execute({"add_admin": {"account": account}})
-
-	def remove_admin(self, account: str) -> SubmittedTx:
-		return self.execute({"remove_admin": {"account": account}})
+	def set_admin(self, account: str) -> SubmittedTx:
+		return self.execute({"set_admin": {"account": account}})
 
 	def set_in_private_transfer_mode(self, value: bool) -> SubmittedTx:
 		return self.execute({"set_in_private_transfer_mode": {"value": value}})
 
+	def set_in_private_claiming_mode(self, value: bool) -> SubmittedTx:
+		return self.execute({"set_in_private_claiming_mode": {"value": value}})
+
+	def set_in_private_staking_mode(self, value: bool) -> SubmittedTx:
+		return self.execute({"set_in_private_staking_mode": {"value": value}})
+
 	def set_handler(self, account: str, is_handler: bool) -> SubmittedTx:
 		return self.execute({"set_handler": {"account": account, "is_handler": is_handler}})
+
+	def set_deposit_token(self, is_deposit_token: bool, token: str) -> SubmittedTx:
+		return self.execute({"set_deposit_token": {"is_deposit_token": is_deposit_token, "token": token}})
+
+	def stake(self, amount: "Uint128", deposit_token: str) -> SubmittedTx:
+		return self.execute({"stake": {"amount": amount, "deposit_token": deposit_token}})
+
+	def stake_for_account(self, account: str, amount: "Uint128", deposit_token: str, funding_account: str) -> SubmittedTx:
+		return self.execute({"stake_for_account": {"account": account, "amount": amount, "deposit_token": deposit_token, "funding_account": funding_account}})
+
+	def unstake(self, amount: "Uint128", deposit_token: str) -> SubmittedTx:
+		return self.execute({"unstake": {"amount": amount, "deposit_token": deposit_token}})
+
+	def unstake_for_account(self, account: str, amount: "Uint128", deposit_token: str, recipient: str) -> SubmittedTx:
+		return self.execute({"unstake_for_account": {"account": account, "amount": amount, "deposit_token": deposit_token, "recipient": recipient}})
+
+	def update_rewards(self) -> SubmittedTx:
+		return self.execute({"update_rewards": {}})
+
+	def claim(self, recipient: str) -> SubmittedTx:
+		return self.execute({"claim": {"recipient": recipient}})
+
+	def claim_for_account(self, account: str, recipient: str) -> SubmittedTx:
+		return self.execute({"claim_for_account": {"account": account, "recipient": recipient}})
 
 	def balance(self, address: str) -> "QueryResponse_balance":
 		return self.query({"balance": {"address": address}})
@@ -493,11 +725,35 @@ class OmxCwBaseToken(BaseOmxClient):
 	def download_logo(self) -> "QueryResponse_download_logo":
 		return self.query({"download_logo": {}})
 
-	def total_staked(self) -> "QueryResponse_total_staked":
-		return self.query({"total_staked": {}})
+	def claimable(self, account: str) -> "QueryResponse_claimable":
+		return self.query({"claimable": {"account": account}})
 
-	def staked_balance(self, account: str) -> "QueryResponse_staked_balance":
-		return self.query({"staked_balance": {"account": account}})
+	def deposit_balance(self, account: str, token: str) -> "QueryResponse_deposit_balance":
+		return self.query({"deposit_balance": {"account": account, "token": token}})
 
-	def id(self) -> "QueryResponse_id":
-		return self.query({"id": {}})
+	def cumulative_rewards(self, account: str) -> "QueryResponse_cumulative_rewards":
+		return self.query({"cumulative_rewards": {"account": account}})
+
+	def average_staked_amount(self, account: str) -> "QueryResponse_average_staked_amount":
+		return self.query({"average_staked_amount": {"account": account}})
+
+	def total_deposit_supply(self, token: str) -> "QueryResponse_total_deposit_supply":
+		return self.query({"total_deposit_supply": {"token": token}})
+
+	def staked_amount(self, account: str) -> "QueryResponse_staked_amount":
+		return self.query({"staked_amount": {"account": account}})
+
+	def reward_token(self) -> "QueryResponse_reward_token":
+		return self.query({"reward_token": {}})
+
+	def initialized(self) -> "QueryResponse_initialized":
+		return self.query({"initialized": {}})
+
+	def is_handler(self, account: str) -> "QueryResponse_is_handler":
+		return self.query({"is_handler": {"account": account}})
+
+	def is_deposit_token(self, token: str) -> "QueryResponse_is_deposit_token":
+		return self.query({"is_deposit_token": {"token": token}})
+
+	def reward_tracker_state(self) -> "QueryResponse_reward_tracker_state":
+		return self.query({"reward_tracker_state": {}})

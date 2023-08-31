@@ -6,6 +6,10 @@ from typing import Tuple, TypedDict, List, Optional, Union
 
 QueryResponse_adjust_for_decimals = str
 
+QueryResponse_all_whitelisted_tokens = str
+
+QueryResponse_all_whitelisted_tokens_amount = int
+
 QueryResponse_cumulative_funding_rates = str
 
 QueryResponse_entry_funding_rate = str
@@ -140,6 +144,8 @@ QueryResponse_vault_state__router = Optional["Addr"]
 
 QueryResponse_vault_state__use_swap_pricing = bool
 
+QueryResponse_vault_state__whitelisted_token_count = int
+
 class QueryResponse_vault_state(TypedDict):
 	admin: "Addr"
 	all_whitelisted_tokens: "QueryResponse_vault_state__all_whitelisted_tokens"
@@ -169,7 +175,7 @@ class QueryResponse_vault_state(TypedDict):
 	tax_basis_points: "Uint128"
 	total_token_weights: "Uint128"
 	use_swap_pricing: bool
-	whitelisted_token_count: "Uint128"
+	whitelisted_token_count: int
 
 QueryResponse_whitelisted_token__decimals = int
 
@@ -412,6 +418,14 @@ class AdjustForDecimalsQuery(TypedDict):
 	amount: "Uint128"
 	token_div: str
 	token_mul: str
+
+class AllWhitelistedTokensAmountQuery(TypedDict):
+	pass
+
+AllWhitelistedTokensQuery__index = int
+
+class AllWhitelistedTokensQuery(TypedDict):
+	index: int
 
 CumulativeFundingRatesQuery__token = str
 
@@ -842,6 +856,9 @@ class QueryMsg__is_manager(TypedDict):
 class QueryMsg__pool_amount(TypedDict):
 	pool_amount: "PoolAmountQuery"
 
+class QueryMsg__all_whitelisted_tokens(TypedDict):
+	all_whitelisted_tokens: "AllWhitelistedTokensQuery"
+
 class QueryMsg__whitelisted_token(TypedDict):
 	whitelisted_token: "WhitelistedTokenQuery"
 
@@ -857,7 +874,10 @@ class QueryMsg__fee_reserves(TypedDict):
 class QueryMsg__validate_liquidation(TypedDict):
 	validate_liquidation: "ValidateLiquidationQuery"
 
-QueryMsg = Union["QueryMsg__vault_state", "QueryMsg__vault_config", "QueryMsg__utilization", "QueryMsg__cumulative_funding_rates", "QueryMsg__position_leverage", "QueryMsg__token_to_usd_min", "QueryMsg__global_short_average_prices", "QueryMsg__global_short_sizes", "QueryMsg__position_delta", "QueryMsg__reserved_amounts", "QueryMsg__guaranteed_usd", "QueryMsg__usdo_amount", "QueryMsg__entry_funding_rate", "QueryMsg__next_global_short_average_price", "QueryMsg__next_funding_rate", "QueryMsg__funding_fee", "QueryMsg__min_price", "QueryMsg__max_price", "QueryMsg__redemption_amount", "QueryMsg__target_usdo_amount", "QueryMsg__adjust_for_decimals", "QueryMsg__is_router_approved", "QueryMsg__get_delta", "QueryMsg__redemption_collateral", "QueryMsg__redemption_collateral_usd", "QueryMsg__position_fee", "QueryMsg__max_global_short_price", "QueryMsg__next_average_price", "QueryMsg__is_manager", "QueryMsg__pool_amount", "QueryMsg__whitelisted_token", "QueryMsg__positions", "QueryMsg__position", "QueryMsg__fee_reserves", "QueryMsg__validate_liquidation"]
+class QueryMsg__all_whitelisted_tokens_amount(TypedDict):
+	all_whitelisted_tokens_amount: "AllWhitelistedTokensAmountQuery"
+
+QueryMsg = Union["QueryMsg__vault_state", "QueryMsg__vault_config", "QueryMsg__utilization", "QueryMsg__cumulative_funding_rates", "QueryMsg__position_leverage", "QueryMsg__token_to_usd_min", "QueryMsg__global_short_average_prices", "QueryMsg__global_short_sizes", "QueryMsg__position_delta", "QueryMsg__reserved_amounts", "QueryMsg__guaranteed_usd", "QueryMsg__usdo_amount", "QueryMsg__entry_funding_rate", "QueryMsg__next_global_short_average_price", "QueryMsg__next_funding_rate", "QueryMsg__funding_fee", "QueryMsg__min_price", "QueryMsg__max_price", "QueryMsg__redemption_amount", "QueryMsg__target_usdo_amount", "QueryMsg__adjust_for_decimals", "QueryMsg__is_router_approved", "QueryMsg__get_delta", "QueryMsg__redemption_collateral", "QueryMsg__redemption_collateral_usd", "QueryMsg__position_fee", "QueryMsg__max_global_short_price", "QueryMsg__next_average_price", "QueryMsg__is_manager", "QueryMsg__pool_amount", "QueryMsg__all_whitelisted_tokens", "QueryMsg__whitelisted_token", "QueryMsg__positions", "QueryMsg__position", "QueryMsg__fee_reserves", "QueryMsg__validate_liquidation", "QueryMsg__all_whitelisted_tokens_amount"]
 
 
 
@@ -1057,6 +1077,9 @@ class OmxCwVault(BaseOmxClient):
 	def pool_amount(self, token: str) -> "QueryResponse_pool_amount":
 		return self.query({"pool_amount": {"token": token}})
 
+	def all_whitelisted_tokens(self, index: int) -> "QueryResponse_all_whitelisted_tokens":
+		return self.query({"all_whitelisted_tokens": {"index": index}})
+
 	def whitelisted_token(self, token: str) -> "QueryResponse_whitelisted_token":
 		return self.query({"whitelisted_token": {"token": token}})
 
@@ -1071,3 +1094,6 @@ class OmxCwVault(BaseOmxClient):
 
 	def validate_liquidation(self, account: str, collateral_token: str, index_token: str, is_long: bool, should_raise: bool) -> "QueryResponse_validate_liquidation":
 		return self.query({"validate_liquidation": {"account": account, "collateral_token": collateral_token, "index_token": index_token, "is_long": is_long, "should_raise": should_raise}})
+
+	def all_whitelisted_tokens_amount(self) -> "QueryResponse_all_whitelisted_tokens_amount":
+		return self.query({"all_whitelisted_tokens_amount": {}})
