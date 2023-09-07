@@ -1,7 +1,7 @@
 from omxpy.base_client import BaseOmxClient
 from cosmpy.aerial.tx_helpers import SubmittedTx
 from cosmpy.aerial.wallet import Wallet
-from typing import TypedDict, Union, Tuple
+from typing import TypedDict, Union, Tuple, Optional
 
 
 Addr = str
@@ -464,9 +464,12 @@ class IncreaseOrderQuery(TypedDict):
 	account: str
 	order_index: "Uint128"
 
-OrdersQuery__ready = bool
+OrdersQuery__account = Optional[str]
+
+OrdersQuery__ready = Optional[bool]
 
 class OrdersQuery(TypedDict):
+	account: str
 	ready: bool
 
 SwapOrderQuery__account = str
@@ -725,8 +728,8 @@ class OmxCwOrderbook(BaseOmxClient):
 	def decrease_order(self, account: str, order_index: "Uint128") -> "QueryResponse_decrease_order":
 		return self.query({"decrease_order": {"account": account, "order_index": order_index}})
 
-	def orders(self, ready: bool) -> "QueryResponse_orders":
-		return self.query({"orders": {"ready": ready}})
+	def orders(self, account: str, ready: bool) -> "QueryResponse_orders":
+		return self.query({"orders": {"account": account, "ready": ready}})
 
 	def increase_order(self, account: str, order_index: "Uint128") -> "QueryResponse_increase_order":
 		return self.query({"increase_order": {"account": account, "order_index": order_index}})
